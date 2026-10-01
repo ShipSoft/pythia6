@@ -3,7 +3,6 @@ Cmake_Minimum_Required(VERSION 2.6.0 FATAL_ERROR)
 Project(Pythia6)
 Enable_Language(Fortran)
 
-message("make $ENV{PYTHIA6VERSION} for external PDFLIB, remove DUMMY subroutines")
 set(Pythia_FSRCS
 pythia-6.4.28.f
 tpythia6_called_from_cc.F
