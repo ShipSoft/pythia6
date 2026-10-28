@@ -41,7 +41,7 @@ If(CMAKE_SYSTEM_NAME MATCHES Darwin)
   # PATH (toolchains such as conda-forge's name it with a target prefix), and
   # compare the whole version: gfortran 10 and later have two-digit majors.
   If(CMAKE_Fortran_COMPILER_ID STREQUAL "GNU"
-     AND CMAKE_Fortran_COMPILER_VERSION VERSION_GREATER_EQUAL 6)
+     AND NOT CMAKE_Fortran_COMPILER_VERSION VERSION_LESS 6)
     Execute_Process(COMMAND ${CMAKE_Fortran_COMPILER} -print-file-name=libgfortran.dylib
                     OUTPUT_VARIABLE _gfortran_path
                     OUTPUT_STRIP_TRAILING_WHITESPACE
