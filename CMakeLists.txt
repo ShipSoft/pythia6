@@ -37,12 +37,14 @@ Add_Library(pythia6 SHARED ${Pythia_FSRCS} ${Pythia_CSRCS})
 If(CMAKE_SYSTEM_NAME MATCHES Darwin)
   SET(CMAKE_SHARED_LIBRARY_CREATE_Fortran_FLAGS "${CMAKE_SHARED_LIBRARY_CREATE_Fortran_FLAGS} -flat_namespace -single_module -undefined dynamic_lookup")
 
-  Execute_Process(COMMAND gfortran -dumpversion
-                  OUTPUT_VARIABLE _gfortran_version)
-  String(SUBSTRING ${_gfortran_version} 0 1 _gfortran_major_version)
-  If(${_gfortran_major_version} GREATER 5)
-    Execute_Process(COMMAND gfortran -print-file-name=libgfortran.dylib
+  # Use the Fortran compiler CMake found rather than whatever "gfortran" is on
+  # PATH (toolchains such as conda-forge's name it with a target prefix), and
+  # compare the whole version: gfortran 10 and later have two-digit majors.
+  If(CMAKE_Fortran_COMPILER_ID STREQUAL "GNU"
+     AND CMAKE_Fortran_COMPILER_VERSION VERSION_GREATER_EQUAL 6)
+    Execute_Process(COMMAND ${CMAKE_Fortran_COMPILER} -print-file-name=libgfortran.dylib
                     OUTPUT_VARIABLE _gfortran_path
+                    OUTPUT_STRIP_TRAILING_WHITESPACE
                    )
     Get_Filename_COMPONENT(_gfortran_libdir ${_gfortran_path} DIRECTORY)
     Message("${_gfortran_libdir}")
