@@ -30002,6 +30002,9 @@ C...Derive kinematical quantities
       IF(ISTSB.GE.3.AND.ISTSB.LE.5) TAUE=TAUP
       X(1)=SQRT(TAUE)*EXP(YST)
       X(2)=SQRT(TAUE)*EXP(-YST)
+C...Diagnostic patch: DIS uses a separate Bjorken-x calculation below.
+C...Do not reject DIS using unrelated tau/y left by earlier processes.
+      IF(ISUB.NE.99) THEN
       IF(MINT(45).EQ.2.AND.ISTSB.GE.1) THEN
         IF(X(1).GT.1D0-1D-7) RETURN
       ELSEIF(MINT(45).EQ.3) THEN
@@ -30011,6 +30014,7 @@ C...Derive kinematical quantities
         IF(X(2).GT.1D0-1D-7) RETURN
       ELSEIF(MINT(46).EQ.3) THEN
         X(2)=MIN(1D0-1.1D-10,X(2))
+      ENDIF
       ENDIF
       SH=MAX(1D0,TAU*VINT(2))
       SQM3=VINT(63)
