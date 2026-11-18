@@ -7415,11 +7415,20 @@ C...User process intialization: cross section model dependent.
           NPOSI=NPOSI+1
           GOTO 450
         ELSEIF(ISUB.EQ.99.AND.MSUB(ISUB).EQ.1) THEN
+C...DIS: use the same dummy kinematics as PYRAND, so that values left
+C...behind by earlier processes or events do not reject the point.
+          VINT(21)=0.9D0
+          VINT(22)=0D0
+          VINT(23)=0D0
+          VINT(47)=0D0
+          VINT(48)=0D0
           CALL PYSIGH(NCHN,SIGS)
           XSEC(ISUB,1)=SIGS
           IF(MINT(141).NE.0.OR.MINT(142).NE.0) XSEC(ISUB,1)=
      &    WTGAGA*XSEC(ISUB,1)
           IF(XSEC(ISUB,1).EQ.0D0) THEN
+            CALL PYERRM(9,'(PYMAXI:) DIS process 99 has vanishing '//
+     &      'cross-section and is switched off')
             MSUB(ISUB)=0
           ELSE
             NPOSI=NPOSI+1
@@ -8696,6 +8705,9 @@ C...Choose between allowed alternatives.
           DO 210 IG=1,MINT(121)
             XSUMCP=XSUMCP+XSECCP(IG,0,1)
   210     CONTINUE
+C...Stop instead of looping forever if no class can be generated.
+          IF(.NOT.(XSUMCP.GT.0D0)) CALL PYERRM(26,
+     &    '(PYSAVE:) no photon class has non-vanishing cross-section')
           XSUMCP=XSUMCP*PYR(0)
           DO 220 IG=1,MINT(121)
             IGA=IG
