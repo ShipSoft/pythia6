@@ -3057,6 +3057,7 @@ C...Precalculate flavour selection weights.
 C...Loop over gamma-p or gamma-gamma alternatives.
       CKIN3=CKIN(3)
       MSAV48=0
+      XSAVCP=0D0
       DO 160 IGA=1,MINT(121)
         CKIN(3)=CKIN3
         MINT(122)=IGA
@@ -3136,8 +3137,9 @@ C...Initialize multiple interactions with variable impact parameter.
  
 C...Save results for gamma-p and gamma-gamma alternatives.
         IF(MINT(121).GT.1) CALL PYSAVE(1,IGA)
+        XSAVCP=XSAVCP+XSEC(0,1)
   160 CONTINUE
- 
+
 C...Initialization finished.
       IF(MSAV48.EQ.0) THEN
         IF(MSTP(127).NE.1) THEN
@@ -3145,6 +3147,17 @@ C...Initialization finished.
           CALL PYSTOP(1)
         ELSE
           WRITE(MSTU(11),5700)
+          MSTI(53)=1
+        ENDIF
+C...Stop or raise warning flag if no gamma-p or gamma-gamma alternative
+C...can be generated (the single-alternative case is caught in PYMAXI).
+      ELSEIF(MINT(121).GT.1.AND.MSTP(121).LE.1.AND.
+     &.NOT.(XSAVCP.GT.0D0)) THEN
+        IF(MSTP(127).NE.1) THEN
+          WRITE(MSTU(11),5800)
+          CALL PYSTOP(1)
+        ELSE
+          WRITE(MSTU(11),5900)
           MSTI(53)=1
         ENDIF
       ENDIF
@@ -3165,7 +3178,12 @@ C...Formats for initialization information.
      &22('*'))
  5700 FORMAT(1X,'Error: no subprocess switched on.'/
      &1X,'Execution will stop if you try to generate events.')
- 
+ 5800 FORMAT(1X,'Error: no photon alternative has non-vanishing ',
+     &'cross-section.'/1X,'Execution stopped.')
+ 5900 FORMAT(1X,'Error: no photon alternative has non-vanishing ',
+     &'cross-section.'/
+     &1X,'Execution will stop if you try to generate events.')
+
       RETURN
       END
  
@@ -3209,7 +3227,7 @@ C...Optionally let PYEVNW do the whole job.
       ENDIF
  
 C...Stop if no subprocesses on.
-      IF(MINT(121).EQ.1.AND.MSTI(53).EQ.1) THEN
+      IF(MSTI(53).EQ.1) THEN
         WRITE(MSTU(11),5100)
         CALL PYSTOP(1)
       ENDIF
@@ -3587,7 +3605,7 @@ C...Local arrays.
       DIMENSION VTX(4)
  
 C...Stop if no subprocesses on.
-      IF(MINT(121).EQ.1.AND.MSTI(53).EQ.1) THEN
+      IF(MSTI(53).EQ.1) THEN
         WRITE(MSTU(11),5100)
         CALL PYSTOP(1)
       ENDIF
@@ -4779,7 +4797,7 @@ C...HEPEUP for output.
       SAVE /HEPEUP/
  
 C...Stop if no subprocesses on.
-      IF(MINT(121).EQ.1.AND.MSTI(53).EQ.1) THEN
+      IF(MSTI(53).EQ.1) THEN
         WRITE(MSTU(11),5100)
         STOP
       ENDIF
